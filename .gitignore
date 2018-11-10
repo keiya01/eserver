@@ -13,7 +13,7 @@
 *.out
 
 #dep
-vender/
+vendor/
 Gopkg.lock
 Gopkg.toml
 

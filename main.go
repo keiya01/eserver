@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	DBHandler := database.NewDBHandler()
+	DBHandler := database.NewHandler()
 	migrate.Set(DBHandler.DB)
 	s := http.NewServer()
 	s.Router()

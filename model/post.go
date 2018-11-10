@@ -6,6 +6,10 @@ type Post struct {
 	Body  string `json:"body"`
 }
 
+type PostService interface {
+	FindAll() (*Post, error)
+}
+
 func NewPost(title, body string) *Post {
 	return &Post{
 		Title: title,
