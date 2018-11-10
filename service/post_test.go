@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 
 }
 
-func Testデータベースに保存されている投稿データを全て取得することを確認する(t *testing.T) {
+func Testデータベースに保存されている投稿データを全て取得することを確認するテスト(t *testing.T) {
 	time := `"2014-12-31T08:04:18+09:00"`
 	tests := []struct {
 		name    string
