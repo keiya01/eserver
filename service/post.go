@@ -21,10 +21,10 @@ func NewPostService() *PostService {
 }
 
 // FindAll DBからPostに関する全てのデータを取得する。
-func (p *PostService) FindAll() (*model.Post, error) {
-	var posts model.Post
+func (p *PostService) FindAll() (*[]model.Post, error) {
+	var posts []model.Post
 	p.handler.DB.Order("created_at desc").Find(&posts)
-	if posts.ID == 0 {
+	if len(posts) == 0 {
 		err := errors.New("ユーザーが存在していません")
 		return &posts, err
 	}

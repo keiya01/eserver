@@ -16,22 +16,25 @@ func TestMain(m *testing.M) {
 	defer handler.DB.Close()
 	migrate.Set(handler.DB)
 	loc, _ := time.LoadLocation("Asia/Tokyo")
-	post := model.Post{
-		Title: "Hello",
-		Body:  "World",
-		Model: model.Model{
-			CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-			UpdatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-		},
+
+	for i := 0; i < 10; i++ {
+		post := model.Post{
+			Title: "Hello",
+			Body:  "World",
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+			},
+		}
+		handler.DB.Create(&post)
 	}
-	handler.DB.Create(&post)
 
 	code := m.Run()
 	defer os.Exit(code)
 
 }
 
-func Testデータベースに保存されている投稿データを全て取得することを確認するテスト(t *testing.T) {
+func Benchmarkデータベースに保存されている投稿データを取得出来ることを確認するテスト(b *testing.B) {
 	time := `"2014-12-31T08:04:18+09:00"`
 	tests := []struct {
 		name    string
@@ -39,21 +42,23 @@ func Testデータベースに保存されている投稿データを全て取�
 		wantErr bool
 	}{
 		{
-			name: "3つの投稿データを取得できていることを確認する",
+			name: "全てのの投稿データを取得できていることを確認すること",
 			want: `{"id":1,"created_at":` + time + `,"updated_at":` + time + `,"title":"Hello","body":"World"}`,
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		b.Run(tt.name, func(b *testing.B) {
 			handler := database.NewTestHandler()
 			p := PostService{
 				handler: handler,
 			}
 			posts, _ := p.FindAll()
-			json, _ := json.Marshal(posts)
-			get := string(json)
-			if get != tt.want {
-				t.Errorf("FindAll() get = %v want = %v", get, tt.want)
+			for _, post := range *posts {
+				json, _ := json.Marshal(post)
+				get := string(json)
+				if get != tt.want {
+					b.Errorf("FindAll() get = %v want = %v", get, tt.want)
+				}
 			}
 		})
 	}
