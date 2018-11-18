@@ -6,10 +6,11 @@ import (
 
 	"github.com/keiya01/eserver/model"
 	"github.com/keiya01/eserver/service"
+	"github.com/keiya01/eserver/service/database"
 )
 
 type PostController struct {
-	PostService model.PostService
+	*service.Service
 }
 
 func NewPostController() *PostController {
@@ -17,13 +18,10 @@ func NewPostController() *PostController {
 }
 
 func (p PostController) Index(w http.ResponseWriter, r *http.Request) {
-	postService := service.NewPostService()
-	p.PostService = postService
-	posts, err := p.PostService.FindAll()
-	if err != nil {
-		err := model.NewError(err)
-		json.NewEncoder(w).Encode(err)
-	} else {
-		json.NewEncoder(w).Encode(posts)
-	}
+	db := database.NewHandler()
+	service := service.NewService(db)
+	posts := []model.Post{}
+	service.FindAll(&posts, "created_at desc")
+
+	json.NewEncoder(w).Encode(posts)
 }

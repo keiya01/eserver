@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var client = new(http.Client)
@@ -20,5 +18,7 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 
 	resp, _ := client.Do(req)
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	if  resp.StatusCode != 200 {
+		t.Errorf("HTTP Test : get = %d", resp.StatusCode)
+	}
 }

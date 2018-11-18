@@ -2,17 +2,13 @@ package model
 
 type Post struct {
 	Model
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
-type PostService interface {
-	FindAll() (*Post, error)
-}
-
-func NewPost(title, body string) *Post {
+func NewPost(name, url string) *Post {
 	return &Post{
-		Title: title,
-		Body:  body,
+		Name: name,
+		URL:  url,
 	}
 }

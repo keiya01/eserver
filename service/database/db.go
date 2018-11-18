@@ -6,7 +6,7 @@ import (
 )
 
 type Handler struct {
-	DB *gorm.DB
+	*gorm.DB
 }
 
 func NewHandler() *Handler {
@@ -15,9 +15,7 @@ func NewHandler() *Handler {
 		panic(err)
 	}
 
-	handler := Handler{
-		DB: db,
-	}
+	handler := Handler{db}
 
 	return &handler
 }
@@ -28,9 +26,7 @@ func NewTestHandler() *Handler {
 		panic(err)
 	}
 
-	handler := Handler{
-		DB: db,
-	}
+	handler := Handler{db}
 
 	return &handler
 }
