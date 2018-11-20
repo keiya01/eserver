@@ -1,5 +1,7 @@
 package model
 
+import "net/http"
+
 type Post struct {
 	Model
 	Name string `json:"name"`
@@ -11,4 +13,8 @@ func NewPost(name, url string) *Post {
 		Name: name,
 		URL:  url,
 	}
+}
+
+func (p *Post) Bind(r *http.Request) error {
+	return nil
 }

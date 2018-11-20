@@ -10,7 +10,7 @@ type Handler struct {
 }
 
 func NewHandler() *Handler {
-	db, err := gorm.Open("sqlite3", "blog.sqlite3")
+	db, err := gorm.Open("sqlite3", "eserver.sqlite3")
 	if err != nil {
 		panic(err)
 	}
