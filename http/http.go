@@ -33,6 +33,7 @@ func (s *Server) Router() {
 			posts.Get("/{id}", p.Show)
 			posts.Post("/create", p.Create)
 			posts.Put("/{id}/update", p.Update)
+			posts.Delete("/{id}/delete", p.Delete)
 		})
 	})
 }

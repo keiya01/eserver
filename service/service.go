@@ -57,8 +57,8 @@ func (s *Service) Update(model interface{}, params map[string]interface{}) error
 }
 
 // Delete 指定された構造体の情報と一致するデータを削除します。
-func (s *Service) Delete(model interface{}) error {
-	if db := s.Handler.Delete(model); db.Error != nil {
+func (s *Service) Delete(model interface{}, where ...interface{}) error {
+	if db := s.Handler.Delete(model, where...); db.Error != nil {
 		return errors.Wrap(db.Error, "Delete()")
 	}
 

@@ -315,8 +315,8 @@ func Testデータを削除できることを確認するテスト(t *testing.T)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			startMockDB(tt.args.posts, func(s *Service) {
-				post := model.Post{Model: model.Model{ID: 1}}
-				s.Delete(&post)
+				post := model.Post{}
+				s.Delete(&post, 1)
 				var get model.Post
 				s.FindOne(&get, 1)
 
