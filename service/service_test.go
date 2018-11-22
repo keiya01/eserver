@@ -12,10 +12,18 @@ import (
 	"github.com/keiya01/eserver/service/migrate"
 )
 
+func TestMain(m *testing.M) {
+	os.Setenv("ENV", "TEST")
+
+	test := m.Run()
+
+	os.Exit(test)
+}
+
 var loc, _ = time.LoadLocation("Asia/Tokyo")
 
 func startMockDB(mockModel []interface{}, queryTest func(s *Service)) {
-	handler := database.NewTestHandler()
+	handler := database.NewHandler()
 	service := NewService(handler)
 	defer os.Remove("test.sqlite3")
 	defer handler.Close()
@@ -210,7 +218,7 @@ func Testデータベースにデータを保存できることを確認する(t
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := database.NewTestHandler()
+			handler := database.NewHandler()
 			defer os.Remove("test.sqlite3")
 			defer handler.DB.Close()
 			migrate.Set(handler.DB)

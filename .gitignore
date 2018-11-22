@@ -19,3 +19,6 @@ Gopkg.toml
 
 #db
 *.sqlite3
+
+#environment
+.env

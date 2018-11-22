@@ -8,6 +8,13 @@ type Model struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type Response struct {
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+	Error   `json:"error"`
+}
+
 type Error struct {
 	IsErr   bool  `json:"isErr"`
 	Message error `json:"message"`

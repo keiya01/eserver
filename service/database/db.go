@@ -1,6 +1,8 @@
 package database
 
 import (
+	"os"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -10,18 +12,13 @@ type Handler struct {
 }
 
 func NewHandler() *Handler {
-	db, err := gorm.Open("sqlite3", "eserver.sqlite3")
-	if err != nil {
-		panic(err)
+	isTest := os.Getenv("ENV")
+	dbName := "eserver.sqlite3"
+	if isTest == "TEST" {
+		dbName = "test.sqlite3"
 	}
 
-	handler := Handler{db}
-
-	return &handler
-}
-
-func NewTestHandler() *Handler {
-	db, err := gorm.Open("sqlite3", "test.sqlite3")
+	db, err := gorm.Open("sqlite3", dbName)
 	if err != nil {
 		panic(err)
 	}
