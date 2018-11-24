@@ -26,14 +26,20 @@ func (s *Server) Router() {
 	cors := corsNew()
 	s.Use(cors.Handler)
 
-	p := controller.NewPostController()
+	p := controller.PostController{}
+	u := controller.UserController{}
 	s.Route("/api", func(api chi.Router) {
 		api.Route("/posts", func(posts chi.Router) {
-			posts.Get("/", p.Index)
 			posts.Get("/{id}", p.Show)
 			posts.Post("/create", p.Create)
 			posts.Put("/{id}/update", p.Update)
 			posts.Delete("/{id}/delete", p.Delete)
+		})
+		api.Route("/users", func(users chi.Router) {
+			users.Post("/login", u.Login)
+			users.Post("/create", u.Create)
+			users.Put("/{id}/update", u.Update)
+			users.Delete("/{id}/delete", u.Delete)
 		})
 	})
 }

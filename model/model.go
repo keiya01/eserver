@@ -15,11 +15,6 @@ type Response struct {
 	Error   `json:"error"`
 }
 
-type Error struct {
-	IsErr   bool  `json:"isErr"`
-	Message error `json:"message"`
-}
-
 func NewError(err error) *Error {
 	return &Error{
 		IsErr:   true,

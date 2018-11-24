@@ -95,49 +95,6 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 		wantErr bool
 	}{
 		{
-			name: "/api/postsにアクセスしたときにJSONを返すことを確認する",
-			args: args{
-				path:    "/api/posts",
-				method:  "GET",
-				request: nil,
-			},
-			want: model.Response{
-				Status: 200,
-				Data: []model.Post{
-					model.Post{
-						Name: "Google",
-						Body: "aaaa",
-						URL:  "https://www.google.com",
-						Model: model.Model{
-							ID:        1,
-							CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-							UpdatedAt: time.Time{},
-						},
-					},
-					model.Post{
-						Name: "Yahoo",
-						Body: "aaaaaa",
-						URL:  "https://www.yahoo.ne.jp",
-						Model: model.Model{
-							ID:        2,
-							CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-							UpdatedAt: time.Time{},
-						},
-					},
-					model.Post{
-						Name: "Go",
-						Body: "aaaaaaa",
-						URL:  "https://www.golang.org",
-						Model: model.Model{
-							ID:        3,
-							CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-							UpdatedAt: time.Time{},
-						},
-					},
-				},
-			},
-		},
-		{
 			name: "/api/posts/{id}にアクセスしたときにJSONを返すことを確認する",
 			args: args{
 				path:    "/api/posts/1",

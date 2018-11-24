@@ -16,29 +16,6 @@ import (
 type PostController struct {
 }
 
-func NewPostController() *PostController {
-	return &PostController{}
-}
-
-func (p PostController) Index(w http.ResponseWriter, r *http.Request) {
-	db := database.NewHandler()
-	s := service.NewService(db)
-	defer s.Close()
-
-	posts := []model.Post{}
-
-	if err := s.Select("id, name, body, url, created_at").FindAll(&posts, "created_at desc"); err != nil {
-		panic(err)
-	}
-
-	resp := model.Response{
-		Status: 200,
-		Data:   posts,
-	}
-
-	json.NewEncoder(w).Encode(resp)
-}
-
 func (p PostController) Show(w http.ResponseWriter, r *http.Request) {
 	db := database.NewHandler()
 	s := service.NewService(db)
