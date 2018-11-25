@@ -2,8 +2,8 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -20,7 +20,7 @@ func (p PostController) Show(w http.ResponseWriter, r *http.Request) {
 	db := database.NewHandler()
 	s := service.NewService(db)
 	defer s.Close()
-
+	var resp model.Response
 	paramsID := request.GetParam(r, "id")
 	id, err := strconv.Atoi(paramsID)
 	if err != nil {
@@ -29,13 +29,15 @@ func (p PostController) Show(w http.ResponseWriter, r *http.Request) {
 
 	post := model.Post{}
 	if err := s.Select("name, body, url, created_at").FindOne(&post, id); err != nil {
-		panic(err)
+		dbErr := errors.New("データを取得できませんでした")
+		resp.Error = model.NewError(dbErr)
+
+		json.NewEncoder(w).Encode(resp)
+
+		return
 	}
 
-	resp := model.Response{
-		Status: 200,
-		Data:   post,
-	}
+	resp.Data = post
 
 	json.NewEncoder(w).Encode(resp)
 }
@@ -50,13 +52,18 @@ func (p PostController) Create(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	var resp model.Response
+
 	if err := s.Create(&post); err != nil {
-		log.Printf("Create in PostController(Create()): %v", err)
+		dbErr := errors.New("データを保存できませんでした")
+		resp.Error = model.NewError(dbErr)
+
+		json.NewEncoder(w).Encode(resp)
+
 		return
 	}
 
-	resp := model.Response{
-		Status:  200,
+	resp = model.Response{
 		Message: "データを保存しました",
 	}
 
@@ -85,13 +92,19 @@ func (p PostController) Update(w http.ResponseWriter, r *http.Request) {
 		"url":  post.URL,
 	}
 
+	var resp model.Response
+
 	post.ID = id
 	if err := s.Update(&post, params); err != nil {
-		panic(err)
+		dbErr := errors.New("データを更新できませんでした")
+		resp.Error = model.NewError(dbErr)
+
+		json.NewEncoder(w).Encode(resp)
+
+		return
 	}
 
-	resp := model.Response{
-		Status:  200,
+	resp = model.Response{
 		Message: "データを更新しました",
 	}
 
@@ -103,6 +116,8 @@ func (p PostController) Delete(w http.ResponseWriter, r *http.Request) {
 	s := service.NewService(db)
 	defer s.Close()
 
+	var resp model.Response
+
 	paramsID := request.GetParam(r, "id")
 	id, err := strconv.Atoi(paramsID)
 	if err != nil {
@@ -111,11 +126,15 @@ func (p PostController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	var post model.Post
 	if err := s.Delete(&post, id); err != nil {
-		panic(err)
+		dbErr := errors.New("データを削除できませんでした")
+		resp.Error = model.NewError(dbErr)
+
+		json.NewEncoder(w).Encode(resp)
+
+		return
 	}
 
-	resp := model.Response{
-		Status:  200,
+	resp = model.Response{
 		Message: "データを削除しました",
 	}
 

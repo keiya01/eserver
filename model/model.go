@@ -9,15 +9,7 @@ type Model struct {
 }
 
 type Response struct {
-	Status  int         `json:"status"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 	Error   `json:"error"`
-}
-
-func NewError(err error) *Error {
-	return &Error{
-		IsErr:   true,
-		Message: err,
-	}
 }

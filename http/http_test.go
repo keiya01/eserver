@@ -102,7 +102,6 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				request: nil,
 			},
 			want: model.Response{
-				Status: 200,
 				Data: model.Post{
 					Name: "Google",
 					Body: "aaaa",
@@ -123,7 +122,6 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
 			},
 			want: model.Response{
-				Status:  200,
 				Message: "データを保存しました",
 			},
 		},
@@ -135,7 +133,6 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
 			},
 			want: model.Response{
-				Status:  200,
 				Message: "データを更新しました",
 			},
 		},
@@ -147,7 +144,6 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				request: nil,
 			},
 			want: model.Response{
-				Status:  200,
 				Message: "データを削除しました",
 			},
 		},
