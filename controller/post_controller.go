@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -20,17 +19,18 @@ func (p PostController) Show(w http.ResponseWriter, r *http.Request) {
 	db := database.NewHandler()
 	s := service.NewService(db)
 	defer s.Close()
-	var resp model.Response
+
 	paramsID := request.GetParam(r, "id")
 	id, err := strconv.Atoi(paramsID)
 	if err != nil {
 		panic(err)
 	}
 
+	var resp model.Response
+
 	post := model.Post{}
 	if err := s.Select("name, body, url, created_at").FindOne(&post, id); err != nil {
-		dbErr := errors.New("データを取得できませんでした")
-		resp.Error = model.NewError(dbErr)
+		resp.Error = model.NewError("データを取得できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
 
@@ -55,8 +55,7 @@ func (p PostController) Create(w http.ResponseWriter, r *http.Request) {
 	var resp model.Response
 
 	if err := s.Create(&post); err != nil {
-		dbErr := errors.New("データを保存できませんでした")
-		resp.Error = model.NewError(dbErr)
+		resp.Error = model.NewError("データを保存できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
 
@@ -96,8 +95,7 @@ func (p PostController) Update(w http.ResponseWriter, r *http.Request) {
 
 	post.ID = id
 	if err := s.Update(&post, params); err != nil {
-		dbErr := errors.New("データを更新できませんでした")
-		resp.Error = model.NewError(dbErr)
+		resp.Error = model.NewError("データを更新できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
 
@@ -126,8 +124,7 @@ func (p PostController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	var post model.Post
 	if err := s.Delete(&post, id); err != nil {
-		dbErr := errors.New("データを削除できませんでした")
-		resp.Error = model.NewError(dbErr)
+		resp.Error = model.NewError("データを削除できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
 

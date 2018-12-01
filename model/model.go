@@ -9,6 +9,7 @@ type Model struct {
 }
 
 type Response struct {
+	Token   string      `json:"token"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 	Error   `json:"error"`

@@ -5,7 +5,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/render"
+	"github.com/keiya01/eserver/auth"
 	"github.com/keiya01/eserver/controller"
 )
 
@@ -25,9 +28,15 @@ func NewServer() *Server {
 func (s *Server) Router() {
 	cors := corsNew()
 	s.Use(cors.Handler)
+	s.Use(middleware.RequestID)
+	s.Use(middleware.Logger)
+	s.Use(middleware.URLFormat)
+	s.Use(render.SetContentType(render.ContentTypeJSON))
+	s.Use(auth.JWTAuthentication) // ここでJWTの認証を行う
 
 	p := controller.PostController{}
 	u := controller.UserController{}
+
 	s.Route("/api", func(api chi.Router) {
 		api.Route("/posts", func(posts chi.Router) {
 			posts.Get("/{id}", p.Show)
