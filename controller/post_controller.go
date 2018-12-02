@@ -30,6 +30,8 @@ func (p PostController) Show(w http.ResponseWriter, r *http.Request) {
 
 	post := model.Post{}
 	if err := s.Select("name, body, url, created_at").FindOne(&post, id); err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		w.Header().Add("Content-Type", "application/json")
 		resp.Error = model.NewError("データを取得できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
@@ -55,6 +57,8 @@ func (p PostController) Create(w http.ResponseWriter, r *http.Request) {
 	var resp model.Response
 
 	if err := s.Create(&post); err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		w.Header().Add("Content-Type", "application/json")
 		resp.Error = model.NewError("データを保存できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
@@ -92,16 +96,17 @@ func (p PostController) Update(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	params := map[string]interface{}{
-		"name":       post.Name,
-		"body":       post.Body,
-		"url":        post.URL,
-		"created_at": post.CreatedAt,
+		"name": post.Name,
+		"body": post.Body,
+		"url":  post.URL,
 	}
 
 	var resp model.Response
 
 	post.ID = id
 	if err := s.Update(&post, params); err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		w.Header().Add("Content-Type", "application/json")
 		resp.Error = model.NewError("データを更新できませんでした")
 
 		json.NewEncoder(w).Encode(resp)
@@ -137,6 +142,8 @@ func (p PostController) Delete(w http.ResponseWriter, r *http.Request) {
 
 	var post model.Post
 	if err := s.Delete(&post, id); err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		w.Header().Add("Content-Type", "application/json")
 		resp.Error = model.NewError("データを削除できませんでした")
 
 		json.NewEncoder(w).Encode(resp)

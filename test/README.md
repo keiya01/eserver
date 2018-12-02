@@ -1,15 +1,22 @@
 ## http package
 
-### Post関係のパスにアクセスしたときにJSONを返すことを確認するテスト
+### 指定したパスにアクセスしたときにJSONを返すことを確認するテスト
 - [x] /api/posts/{id}にアクセスしたときにJSONを返すことを確認すること
-- [ ] /api/posts/{id}にアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
+- [x] /api/posts/{id}にアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 - [x] /api/posts/createにアクセスしたときにJSONを返すことを確認すること
-- [ ] /api/posts/createにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
+- [x] /api/posts/createにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 - [x] /api/posts/{id}/updateにアクセスしたときにJSONを返すことを確認すること
-- [ ] /api/posts/{id}/updateにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
+- [x] /api/posts/{id}/updateにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 - [x] /api/posts/{id}/deleteにアクセスしたときにJSONを返すことを確認すること
-- [ ] /api/posts/{id}/deleteにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
+- [x] /api/posts/{id}/deleteにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
+- [x] /api/users/{id}/updateにアクセスしたときにJSONを返すことを確認すること
+- [x] /api/users/{id}/updateにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
+- [x] /api/users/{id}/deleteにアクセスしたときにJSONを返すことを確認すること
+- [x] /api/users/{id}/deleteにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 
+### UserControllerのcreateまたはloginにアクセスしたときに正しいJSONを返すことを確認する
+- [ ] /api/users/createにアクセスしたときにJSONを返すことを確認すること
+- [ ] /api/users/loginにアクセスしたときにJSONを返すことを確認すること
 
 
 ## service package

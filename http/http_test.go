@@ -32,6 +32,9 @@ func TestMain(m *testing.M) {
 }
 
 func newMockModel() []interface{} {
+	pass1, _ := auth.EncryptPassword("password")
+	pass2, _ := auth.EncryptPassword("pass")
+	pass3, _ := auth.EncryptPassword("word")
 	return []interface{}{
 		&model.Post{
 			Name: "Google",
@@ -62,7 +65,23 @@ func newMockModel() []interface{} {
 		},
 		&model.User{
 			Email:    "mail@mail.com",
-			Password: "password",
+			Password: pass1,
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Time{},
+			},
+		},
+		&model.User{
+			Email:    "gmail@mail.com",
+			Password: pass2,
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Time{},
+			},
+		},
+		&model.User{
+			Email:    "mymail@mail.com",
+			Password: pass3,
 			Model: model.Model{
 				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
 				UpdatedAt: time.Time{},
@@ -105,12 +124,12 @@ func newMockJWT(s *service.Service) string {
 
 var client = new(http.Client)
 
-func TestPost関係のパスにアクセスしたときにJSONを返すことを確認するテスト(t *testing.T) {
+func Test指定したパスにアクセスしたときにJSONを返すことを確認するテスト(t *testing.T) {
 	type args struct {
 		path    string
 		method  string
 		request io.Reader
-		status int
+		status  int
 	}
 	tests := []struct {
 		name    string
@@ -125,7 +144,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/1",
 				method:  "GET",
 				request: nil,
-				status: 200,
+				status:  200,
 			},
 			want: model.Response{
 				Data: model.Post{
@@ -147,7 +166,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/1",
 				method:  "GET",
 				request: nil,
-				status: 403,
+				status:  403,
 			},
 			want: model.Response{
 				Error: model.Error{
@@ -162,7 +181,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/create",
 				method:  "POST",
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
-				status: 200,
+				status:  200,
 			},
 			want: model.Response{
 				Message: "データを保存しました",
@@ -181,7 +200,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/create",
 				method:  "POST",
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
-				status: 403,
+				status:  403,
 			},
 			want: model.Response{
 				Error: model.Error{
@@ -196,7 +215,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/1/update",
 				method:  "PUT",
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
-				status: 200,
+				status:  200,
 			},
 			want: model.Response{
 				Message: "データを更新しました",
@@ -215,7 +234,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/1/update",
 				method:  "PUT",
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
-				status: 403,
+				status:  403,
 			},
 			want: model.Response{
 				Error: model.Error{
@@ -230,7 +249,7 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/1/delete",
 				method:  "DELETE",
 				request: nil,
-				status: 200,
+				status:  200,
 			},
 			want: model.Response{
 				Message: "データを削除しました",
@@ -243,7 +262,66 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 				path:    "/api/posts/1/delete",
 				method:  "DELETE",
 				request: nil,
-				status: 403,
+				status:  403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
+			},
+		},
+		{
+			name: "/api/users/{id}/updateにアクセスしたときにJSONを返すことを確認する",
+			args: args{
+				path:    "/api/users/1/update",
+				method:  "PUT",
+				request: strings.NewReader(`{"email":"testMail@test.mail.com","password":"testPassword","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+				status:  200,
+			},
+			want: model.Response{
+				Message: "データを更新しました",
+				Data: map[string]interface{}{
+					"email": "testMail@test.mail.com",
+				},
+			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/users/{id}/updateにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/users/1/update",
+				method:  "PUT",
+				request: strings.NewReader(`{"email":"testMail@test.mail.com","password":"testPassword","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+				status:  403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
+			},
+		},
+		{
+			name: "/api/users/{id}/deleteにアクセスしたときにJSONを返すことを確認する",
+			args: args{
+				path:    "/api/users/1/delete",
+				method:  "DELETE",
+				request: nil,
+				status:  200,
+			},
+			want: model.Response{
+				Message: "データを削除しました",
+			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/users/{id}/deleteにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/users/1/delete",
+				method:  "DELETE",
+				request: nil,
+				status:  403,
 			},
 			want: model.Response{
 				Error: model.Error{
@@ -291,6 +369,62 @@ func TestPost関係のパスにアクセスしたときにJSONを返すことを
 			assert.Equal(t, tt.args.status, resp.StatusCode)
 
 			assert.JSONEq(t, want, respJSON)
+		})
+	}
+}
+
+func TestUserControllerのcreateまたはloginにアクセスしたときに正しいJSONを返すことを確認する(t *testing.T) {
+	type args struct {
+		path    string
+		request io.Reader
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "/api/users/createにアクセスしたときにJSONを返すことを確認すること",
+			args: args{
+				path:    "/api/users/create",
+				request: strings.NewReader(`{"email":"mailmail@mailmail.co.jp","password":"passtestpass","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+			},
+			want: "データを保存しました",
+		},
+		{
+			name: "/api/users/loginにアクセスしたときにJSONを返すことを確認すること",
+			args: args{
+				path:    "/api/users/login",
+				request: strings.NewReader(`{"email":"mail@mail.com","password":"password"}`),
+			},
+			want: "ログインに成功しました",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// DBのデータモック作成用関数
+			_ = newMockServer()
+			defer os.Remove("test.sqlite3")
+
+			server := NewServer()
+			testServer := httptest.NewServer(server)
+			server.Router()
+			defer testServer.Close()
+
+			// リクエスト先のURLを作成し、リクエストを送る
+			path := testServer.URL + tt.args.path
+			req, _ := http.NewRequest("POST", path, tt.args.request)
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := client.Do(req)
+			if err != nil {
+				t.Errorf("client.Do(): %v", err)
+			}
+			defer resp.Body.Close()
+
+			assert.Equal(t, 200, resp.StatusCode)
+
 		})
 	}
 }
