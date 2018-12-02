@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/keiya01/eserver/auth"
 	"github.com/keiya01/eserver/model"
 	"github.com/keiya01/eserver/service"
 	"github.com/keiya01/eserver/service/database"
@@ -59,11 +60,19 @@ func newMockModel() []interface{} {
 				UpdatedAt: time.Time{},
 			},
 		},
+		&model.User{
+			Email:    "mail@mail.com",
+			Password: "password",
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Time{},
+			},
+		},
 	}
 
 }
 
-func newMockServer() {
+func newMockServer() *service.Service {
 	mock := newMockModel()
 	db := database.NewHandler()
 	service := service.NewService(db)
@@ -75,24 +84,40 @@ func newMockServer() {
 		err := service.Create(mock[i])
 		if err != nil {
 			fmt.Printf("newMockModel: %v", err)
-			return
+			return service
 		}
 	}
+
+	return service
+}
+
+func newMockJWT(s *service.Service) string {
+	var user model.User
+	s.Select("id, email").FindOne(&user, 1)
+	token := auth.JWTToken{
+		UserID:    user.ID,
+		UserEmail: user.Email,
+	}
+	jwt := token.GetJWTToken()
+
+	return jwt
 }
 
 var client = new(http.Client)
 
-func Test指定したパスにアクセスしたときにJSONを返すことを確認するテスト(t *testing.T) {
+func TestPost関係のパスにアクセスしたときにJSONを返すことを確認するテスト(t *testing.T) {
 	type args struct {
 		path    string
 		method  string
 		request io.Reader
+		status int
 	}
 	tests := []struct {
 		name    string
 		args    args
 		want    model.Response
 		wantErr bool
+		hasJWT  bool
 	}{
 		{
 			name: "/api/posts/{id}にアクセスしたときにJSONを返すことを確認する",
@@ -100,6 +125,7 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				path:    "/api/posts/1",
 				method:  "GET",
 				request: nil,
+				status: 200,
 			},
 			want: model.Response{
 				Data: model.Post{
@@ -113,6 +139,22 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 					},
 				},
 			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/posts/{id}にアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/posts/1",
+				method:  "GET",
+				request: nil,
+				status: 403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
+			},
 		},
 		{
 			name: "/api/posts/createにアクセスしたときにJSONを返すことを確認する",
@@ -120,9 +162,32 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				path:    "/api/posts/create",
 				method:  "POST",
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+				status: 200,
 			},
 			want: model.Response{
 				Message: "データを保存しました",
+				Data: map[string]interface{}{
+					"name":       "Hello",
+					"body":       "bbbbb",
+					"url":        "https://www.cash.com",
+					"created_at": time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				},
+			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/posts/createにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/posts/create",
+				method:  "POST",
+				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+				status: 403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
 			},
 		},
 		{
@@ -131,9 +196,32 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				path:    "/api/posts/1/update",
 				method:  "PUT",
 				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+				status: 200,
 			},
 			want: model.Response{
 				Message: "データを更新しました",
+				Data: map[string]interface{}{
+					"name":       "Hello",
+					"body":       "bbbbb",
+					"url":        "https://www.cash.com",
+					"created_at": time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				},
+			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/posts/{id}/updateにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/posts/1/update",
+				method:  "PUT",
+				request: strings.NewReader(`{"name":"Hello","body":"bbbbb","url":"https://www.cash.com","created_at":"2014-12-31T08:04:18+09:00","updated_at":"2014-12-31T08:04:18+09:00"}`),
+				status: 403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
 			},
 		},
 		{
@@ -142,17 +230,35 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 				path:    "/api/posts/1/delete",
 				method:  "DELETE",
 				request: nil,
+				status: 200,
 			},
 			want: model.Response{
 				Message: "データを削除しました",
+			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/posts/{id}/deleteにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/posts/1/delete",
+				method:  "DELETE",
+				request: nil,
+				status: 403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// DBのデータモック作成用関数
-			newMockServer()
+			service := newMockServer()
 			defer os.Remove("test.sqlite3")
+			token := newMockJWT(service)
 
 			server := NewServer()
 			testServer := httptest.NewServer(server)
@@ -163,6 +269,10 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 			path := testServer.URL + tt.args.path
 			req, _ := http.NewRequest(tt.args.method, path, tt.args.request)
 			req.Header.Set("Content-Type", "application/json")
+
+			if tt.hasJWT {
+				req.Header.Set("Authorization", "Bearer "+token)
+			}
 
 			resp, err := client.Do(req)
 			if err != nil {
@@ -178,7 +288,7 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 			wantJSON, _ := json.Marshal(tt.want)
 			want := string(wantJSON)
 
-			assert.Equal(t, 200, resp.StatusCode)
+			assert.Equal(t, tt.args.status, resp.StatusCode)
 
 			assert.JSONEq(t, want, respJSON)
 		})

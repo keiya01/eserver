@@ -64,6 +64,12 @@ func (p PostController) Create(w http.ResponseWriter, r *http.Request) {
 
 	resp = model.Response{
 		Message: "データを保存しました",
+		Data: map[string]interface{}{
+			"name":       post.Name,
+			"body":       post.Body,
+			"url":        post.URL,
+			"created_at": post.CreatedAt,
+		},
 	}
 
 	json.NewEncoder(w).Encode(resp)
@@ -86,9 +92,10 @@ func (p PostController) Update(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	params := map[string]interface{}{
-		"name": post.Name,
-		"body": post.Body,
-		"url":  post.URL,
+		"name":       post.Name,
+		"body":       post.Body,
+		"url":        post.URL,
+		"created_at": post.CreatedAt,
 	}
 
 	var resp model.Response
@@ -104,6 +111,12 @@ func (p PostController) Update(w http.ResponseWriter, r *http.Request) {
 
 	resp = model.Response{
 		Message: "データを更新しました",
+		Data: map[string]interface{}{
+			"name":       post.Name,
+			"body":       post.Body,
+			"url":        post.URL,
+			"created_at": post.CreatedAt,
+		},
 	}
 
 	json.NewEncoder(w).Encode(resp)

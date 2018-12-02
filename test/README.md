@@ -1,16 +1,14 @@
 ## http package
 
-### 指定したパスにアクセスしたときにJSONを返すことを確認する
-- [x] /api/posts/にアクセスしたときにJSONを返すことを確認すること
-    - [x] postsテーブルのデータ全てのJSONを返すことを確認すること
+### Post関係のパスにアクセスしたときにJSONを返すことを確認するテスト
 - [x] /api/posts/{id}にアクセスしたときにJSONを返すことを確認すること
-    - [x] postsテーブルのidに一致したデータのJSONを返すことを確認すること
+- [ ] /api/posts/{id}にアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 - [x] /api/posts/createにアクセスしたときにJSONを返すことを確認すること
-    - [x] postsテーブルにデータを追加し、追加したデータのJSONを返すことを確認すること
+- [ ] /api/posts/createにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 - [x] /api/posts/{id}/updateにアクセスしたときにJSONを返すことを確認すること
-    - [x] postsテーブルのidに一致したデータを編集して編集したデータのJSONを返すことを確認すること
+- [ ] /api/posts/{id}/updateにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 - [x] /api/posts/{id}/deleteにアクセスしたときにJSONを返すことを確認すること
-    - [x] postsテーブルのidに一致したデータを削除できることを確認すること
+- [ ] /api/posts/{id}/deleteにアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する
 
 
 
@@ -39,9 +37,6 @@
 
 
 ## auth package
-
-### jwtトークンが発行されることを確認する
-- jwtトークンが発行されることを確認すること
 
 ### jwtトークンをミドルウェアーで認証することを確認すること
 - `/api/users/login, /api/users/create`でリクエストがきた時はJWTがなければ認証をかけないことを確認すること
