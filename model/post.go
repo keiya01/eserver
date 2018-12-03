@@ -5,4 +5,5 @@ type Post struct {
 	Name string `json:"name"`
 	Body string `json:"body"`
 	URL  string `json:"url"`
+	UserID int `json:"user_id"`
 }

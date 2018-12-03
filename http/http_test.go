@@ -36,33 +36,6 @@ func newMockModel() []interface{} {
 	pass2, _ := auth.EncryptPassword("pass")
 	pass3, _ := auth.EncryptPassword("word")
 	return []interface{}{
-		&model.Post{
-			Name: "Google",
-			Body: "aaaa",
-			URL:  "https://www.google.com",
-			Model: model.Model{
-				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-				UpdatedAt: time.Time{},
-			},
-		},
-		&model.Post{
-			Name: "Yahoo",
-			Body: "aaaaaa",
-			URL:  "https://www.yahoo.ne.jp",
-			Model: model.Model{
-				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-				UpdatedAt: time.Time{},
-			},
-		},
-		&model.Post{
-			Name: "Go",
-			Body: "aaaaaaa",
-			URL:  "https://www.golang.org",
-			Model: model.Model{
-				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-				UpdatedAt: time.Time{},
-			},
-		},
 		&model.User{
 			Email:    "mail@mail.com",
 			Password: pass1,
@@ -82,6 +55,36 @@ func newMockModel() []interface{} {
 		&model.User{
 			Email:    "mymail@mail.com",
 			Password: pass3,
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Time{},
+			},
+		},
+		&model.Post{
+			Name:   "Google",
+			Body:   "aaaa",
+			URL:    "https://www.google.com",
+			UserID: 1,
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Time{},
+			},
+		},
+		&model.Post{
+			Name:   "Yahoo",
+			Body:   "aaaaaa",
+			URL:    "https://www.yahoo.ne.jp",
+			UserID: 2,
+			Model: model.Model{
+				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+				UpdatedAt: time.Time{},
+			},
+		},
+		&model.Post{
+			Name:   "Go",
+			Body:   "aaaaaaa",
+			URL:    "https://www.golang.org",
+			UserID: 3,
 			Model: model.Model{
 				CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
 				UpdatedAt: time.Time{},
@@ -111,11 +114,10 @@ func newMockServer() *service.Service {
 }
 
 func newMockJWT(s *service.Service) string {
-	var user model.User
-	s.Select("id, email").FindOne(&user, 1)
+	// var user model.User
 	token := auth.JWTToken{
-		UserID:    user.ID,
-		UserEmail: user.Email,
+		UserID:    1,
+		UserEmail: "mail@mail.com",
 	}
 	jwt := token.GetJWTToken()
 
@@ -261,6 +263,44 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 			args: args{
 				path:    "/api/posts/1/delete",
 				method:  "DELETE",
+				request: nil,
+				status:  403,
+			},
+			want: model.Response{
+				Error: model.Error{
+					IsErr:   true,
+					Message: "認証エラーが発生しました",
+				},
+			},
+		},
+		{
+			name: "/api/users/{id}にアクセスしたときにJSONを返すことを確認する",
+			args: args{
+				path:    "/api/users/1",
+				method:  "GET",
+				request: nil,
+				status:  200,
+			},
+			want: model.Response{
+				Message: "データを取得しました",
+				Data: model.Post{
+					Name: "Google",
+					Body: "aaaa",
+					URL:  "https://www.google.com",
+					Model: model.Model{
+						ID:        0,
+						CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+						UpdatedAt: time.Time{},
+					},
+				},
+			},
+			hasJWT: true,
+		},
+		{
+			name: "/api/users/{id}にアクセスしたときにヘッダーのAuthorizationにJWTを持っていなければエラーを返すことを確認する",
+			args: args{
+				path:    "/api/users/1",
+				method:  "GET",
 				request: nil,
 				status:  403,
 			},

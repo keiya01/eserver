@@ -47,6 +47,7 @@ func (s *Server) Router() {
 		api.Route("/users", func(users chi.Router) {
 			users.Post("/login", u.Login)
 			users.Post("/create", u.Create)
+			users.Get("/{id}", u.Show)
 			users.Put("/{id}/update", u.Update)
 			users.Delete("/{id}/delete", u.Delete)
 		})

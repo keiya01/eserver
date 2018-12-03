@@ -29,7 +29,8 @@ func (p PostController) Show(w http.ResponseWriter, r *http.Request) {
 	var resp model.Response
 
 	post := model.Post{}
-	if err := s.Select("name, body, url, created_at").FindOne(&post, id); err != nil {
+	err = s.Select("name, body, url, created_at").FindOne(&post, id)
+	if err != nil {
 		w.WriteHeader(http.StatusForbidden)
 		w.Header().Add("Content-Type", "application/json")
 		resp.Error = model.NewError("データを取得できませんでした")
@@ -55,6 +56,19 @@ func (p PostController) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var resp model.Response
+	ctx := r.Context().Value("userID")
+	userID, ok := ctx.(float64)
+	if !ok {
+		w.WriteHeader(http.StatusForbidden)
+		w.Header().Add("Content-Type", "application/json")
+		resp.Error = model.NewError("データを取得できませんでした")
+
+		json.NewEncoder(w).Encode(resp)
+
+		return
+	}
+
+	post.UserID = int(userID)
 
 	if err := s.Create(&post); err != nil {
 		w.WriteHeader(http.StatusForbidden)
