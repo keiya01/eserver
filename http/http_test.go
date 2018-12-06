@@ -283,14 +283,16 @@ func Test指定したパスにアクセスしたときにJSONを返すことを�
 			},
 			want: model.Response{
 				Message: "データを取得しました",
-				Data: model.Post{
-					Name: "Google",
-					Body: "aaaa",
-					URL:  "https://www.google.com",
-					Model: model.Model{
-						ID:        0,
-						CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
-						UpdatedAt: time.Time{},
+				Data: []model.Post{
+					model.Post{
+						Name: "Google",
+						Body: "aaaa",
+						URL:  "https://www.google.com",
+						Model: model.Model{
+							ID:        0,
+							CreatedAt: time.Date(2014, 12, 31, 8, 4, 18, 0, loc),
+							UpdatedAt: time.Time{},
+						},
 					},
 				},
 			},

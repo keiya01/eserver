@@ -20,6 +20,12 @@ func (s *Service) Select(field string) *Service {
 	return s
 }
 
+// Pagination limitに最大取得数offsetに取得するデータの開始列番号
+func (s *Service) Pagination(limit, offset int) *Service {
+	s.Handler.DB = s.Limit(limit).Offset(offset)
+	return s
+}
+
 func (s *Service) FindOne(model interface{}, where ...interface{}) error {
 	if db := s.First(model, where...); db.Error != nil {
 		return errors.Wrap(db.Error, "FindOne()")
